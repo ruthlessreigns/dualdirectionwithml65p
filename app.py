@@ -435,3 +435,7 @@ if __name__ == "__main__":
             # কারণ Streamlit শুধু ওয়েব ইউআই রেন্ডার করে।
     except Exception as e:
         print(f"Web UI Mode Active: {e}")
+        import streamlit as st
+
+st.title("🚀 XAUUSD AI Trading Bot Dashboard")
+st.write("Welcome! The Institutional Sniper Bot web interface is now active.")
