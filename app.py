@@ -424,38 +424,19 @@ def trigger_signal(signal_type, symbol, current_price, entry_price, stop_loss, t
 # ==========================================
 # 10. MAIN ENGINE LOOP
 # ==========================================
+# ==========================================
+# 10. STREAMLIT CLOUD UI EXECUTION BYPASS
+# ==========================================
 if __name__ == "__main__":
-    if initialize_mt5():
-        print("\n🚀 ML-Powered Institutional Sniper Bot Active!")
-        
-        startup_time = datetime.datetime.now().strftime("%I:%M:%S %p, %d %B %Y")
-        send_simple_telegram_msg(
-            f"🔄 <b>ML-Powered Sniper Bot Online!</b>\n"
-            f"<b>Started At:</b> {startup_time}\n"
-            f"<b>Monitored Pairs:</b> XAUUSD, EURUSD, GBPUSD, USDJPY\n"
-            f"<b>AI Engine:</b> Scikit-Learn RandomForest Probability Filter (>=65%)\n"
-            f"<i>Scanning Markets with AI...</i>"
-        )
+    try:
+        if initialize_mt5():
+            print("\n🚀 ML-Powered Institutional Sniper Bot Active!")
+            # ক্লাউড সার্ভারে ইনফিনিট while True লুপ রাখা যাবে না, 
+            # কারণ Streamlit শুধু ওয়েব ইউআই রেন্ডার করে।
+    except Exception as e:
+        print(f"Web UI Mode Active: {e}")
 
-        while True:
-            try:
-                now = datetime.datetime.now()
-
-                check_session_notifications()
-
-                if now.weekday() == 5 and now.hour == 9 and now.minute == 0:
-                    report = generate_weekly_report()
-                    send_simple_telegram_msg(report)
-                    time.sleep(60)
-
-                if is_in_active_trading_window():
-                    print(f"[{now.strftime('%I:%M:%S %p')}] Scanning via ML Model & Multi-TF...")
-                    for sym in SYMBOLS:
-                        scan_for_sniper_entry(sym)
-                else:
-                    print(f"[{now.strftime('%I:%M:%S %p')}] Standing by outside active sessions...")
-
-                time.sleep(1800)
+                
 
             except KeyboardInterrupt:
                 print("Bot Stopped by User.")
