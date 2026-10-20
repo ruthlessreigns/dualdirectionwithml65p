@@ -204,11 +204,19 @@ def is_in_active_trading_window():
 # 6. METATRADER 5 DATA ENGINE
 # ==========================================
 def initialize_mt5():
-    if not mt5.initialize():
-        print(f"[MT5] Initialization Failed! Error: {mt5.last_error()}")
-        return False
-    print("[MT5] Connected Successfully to Data Feed.")
-    return True
+    try:
+        import MetaTrader5 as mt5
+        if not mt5.initialize():
+            print(f"[MT5] Initialization Failed! Error: {mt5.last_error()}")
+            return False
+        print("[MT5] Connected Successfully to Data Feed.")
+        return True
+    except ImportError:
+        print("[MT5] MetaTrader5 module not available on Cloud. Running in Web UI mode.")
+        return True  # ক্লাউডের জন্য ট্রু রিটার্ন করবে যাতে অ্যাপ ক্র্যাশ না করে
+    except Exception as e:
+        print(f"[MT5] Error: {e}")
+        return True
 
 def get_rates(symbol, timeframe, count=100):
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, count)
