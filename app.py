@@ -435,13 +435,3 @@ if __name__ == "__main__":
             # কারণ Streamlit শুধু ওয়েব ইউআই রেন্ডার করে।
     except Exception as e:
         print(f"Web UI Mode Active: {e}")
-
-                
-
-            except KeyboardInterrupt:
-                print("Bot Stopped by User.")
-                mt5.shutdown()
-                break
-            except Exception as e:
-                print(f"[ERROR]: {e}")
-                time.sleep(10)
