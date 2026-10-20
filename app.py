@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import MetaTrader5 as mt5
+#import MetaTrader5 as mt5
 import joblib
 from sklearn.ensemble import RandomForestClassifier
 
