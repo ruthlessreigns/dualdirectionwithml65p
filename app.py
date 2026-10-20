@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 #import MetaTrader5 as mt5
 import joblib
 from sklearn.ensemble import RandomForestClassifier
+import streamlit as st
 
 # ==========================================
 # 1. GLOBAL CONFIGURATION & CREDENTIALS
