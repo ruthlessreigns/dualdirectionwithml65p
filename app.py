@@ -64,35 +64,30 @@ st.markdown("---")
 st.subheader(f"📊 Market Analysis & Signals: {selected_symbol}")
 
 if st.button("🚀 Run Instant Market Scan & Fetch Data"):
-    with st.spinner(f"Scanning market and analyzing {selected_symbol}..."):
+    with st.spinner(f"Fetching real-time price and analyzing {selected_symbol}..."):
         time.sleep(1.0)
         
-        mt5_connected = False
+        # yfinance ব্যবহার করে সরাসরি ক্লাউড থেকে রিয়েল-টাইম মার্কেট ডেটা ফেচ করা
         try:
-            import MetaTrader5 as mt5
-            if mt5.initialize():
-                mt5_connected = True
-        except Exception:
-            mt5_connected = False
-
-        if mt5_connected:
-            rates = mt5.copy_rates_from_pos(selected_symbol, mt5.TIMEFRAME_M30, 0, 10)
-            mt5.shutdown()
-            if rates is not None and len(rates) > 0:
-                df = pd.DataFrame(rates)
-                current_price = df.iloc[-1]['close']
-                prev_price = df.iloc[0]['close']
-                trend = "BULLISH MARKET (MT5 Live)" if current_price > prev_price else "BEARISH MARKET (MT5 Live)"
+            import yfinance as yf
+            ticker_symbol = "GC=F" if selected_symbol == "XAUUSD" else f"{selected_symbol}=X"
+            ticker = yf.Ticker(ticker_symbol)
+            todays_data = ticker.history(period="1d", interval="15m")
+            
+            if not todays_data.empty:
+                current_price = round(todays_data['Close'].iloc[-1], 2)
+                open_price = round(todays_data['Open'].iloc[0], 2)
+                trend = "BULLISH MARKET (Live API)" if current_price >= open_price else "BEARISH MARKET (Live API)"
             else:
-                current_price = 2650.50 if selected_symbol == "XAUUSD" else 1.0850
-                trend = "BULLISH MARKET (Simulated)"
-        else:
-            current_price = 2650.50 if selected_symbol == "XAUUSD" else 1.0850
-            trend = "BULLISH MARKET (Cloud Mode)"
+                current_price = "N/A"
+                trend = "Data Fetch Error"
+        except Exception as e:
+            current_price = "API Error"
+            trend = f"Error: {e}"
 
         st.success(f"Scan completed successfully for {selected_symbol}!")
         
-        # কাস্টম কার্ড ব্যবহার করা হয়েছে যাতে লেখাগুলো কেটে না যায়
+        # কাস্টম কার্ড ব্যবহার করে তথ্য প্রদর্শন
         res_col1, res_col2, res_col3 = st.columns(3)
         
         with res_col1:
