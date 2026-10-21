@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import os
 import datetime
-import MetaTrader5 as mt5
+#import MetaTrader5 as mt5
 
 # ==========================================
 # PAGE CONFIGURATION
