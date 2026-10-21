@@ -18,6 +18,7 @@ st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #ffffff; }
     .stMetric { background-color: #1a1c23; padding: 15px; border-radius: 10px; border: 1px solid #30333d; }
+    .custom-card { background-color: #1a1c23; padding: 20px; border-radius: 10px; border: 1px solid #30333d; margin-bottom: 10px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -32,7 +33,6 @@ st.markdown("AI-Powered Smart Money Concepts (SMC) & Multi-TF Trading System hos
 # ==========================================
 st.sidebar.header("⚙️ Bot Controls & Settings")
 
-# টেলিগ্রাম ক্রেন্ডেনশিয়াল ইনপুট বক্স
 st.sidebar.subheader("📢 Telegram Configurations")
 telegram_token_input = st.sidebar.text_input("Telegram Bot Token", value="8861143878:AAGo0rx1OIPBXc_z_3xlqP8AF-GM_kml0TA", type="password")
 telegram_chat_id_input = st.sidebar.text_input("Telegram Chat ID", value="6611581565")
@@ -67,7 +67,6 @@ if st.button("🚀 Run Instant Market Scan & Fetch Data"):
     with st.spinner(f"Scanning market and analyzing {selected_symbol}..."):
         time.sleep(1.0)
         
-        # এমটি৫ কানেকশন ও ডেটা চেক (সেফ মোড - ক্লাউড ও লোকাল উভয়ের জন্য উপযোগী)
         mt5_connected = False
         try:
             import MetaTrader5 as mt5
@@ -83,22 +82,42 @@ if st.button("🚀 Run Instant Market Scan & Fetch Data"):
                 df = pd.DataFrame(rates)
                 current_price = df.iloc[-1]['close']
                 prev_price = df.iloc[0]['close']
-                trend = "🟢 BULLISH MARKET" if current_price > prev_price else "🔴 BEARISH MARKET"
+                trend = "BULLISH MARKET (MT5 Live)" if current_price > prev_price else "BEARISH MARKET (MT5 Live)"
             else:
                 current_price = 2650.50 if selected_symbol == "XAUUSD" else 1.0850
-                trend = "🟢 BULLISH MARKET (Simulated Feed)"
+                trend = "BULLISH MARKET (Simulated)"
         else:
-            # ক্লাউড সার্ভারের জন্য সিমুলেটেড ডেটা ফেড
             current_price = 2650.50 if selected_symbol == "XAUUSD" else 1.0850
-            trend = "🟢 BULLISH MARKET (Cloud Mode - MT5 Local Only)"
+            trend = "BULLISH MARKET (Cloud Mode)"
 
         st.success(f"Scan completed successfully for {selected_symbol}!")
         
-        # স্ক্রিনে লাইভ প্রাইস, ট্রেন্ড ও জেনারেটেড সিগন্যাল প্রদর্শন
+        # কাস্টম কার্ড ব্যবহার করা হয়েছে যাতে লেখাগুলো কেটে না যায়
         res_col1, res_col2, res_col3 = st.columns(3)
-        res_col1.metric(label="Current Live Price", value=f"${current_price}")
-        res_col2.metric(label="Market Bias / Trend", value=trend)
-        res_col3.metric(label="Generated Signal", value="BUY LIMIT (ML Confirmed)")
+        
+        with res_col1:
+            st.markdown(f"""
+                <div class="custom-card">
+                    <p style='color: gray; font-size: 13px; margin-bottom: 5px;'>CURRENT LIVE PRICE</p>
+                    <h3 style='color: #ffffff; margin: 0;'>${current_price}</h3>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with res_col2:
+            st.markdown(f"""
+                <div class="custom-card">
+                    <p style='color: gray; font-size: 13px; margin-bottom: 5px;'>MARKET BIAS / TREND</p>
+                    <h4 style='color: #00ff66; margin: 0;'>{trend}</h4>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with res_col3:
+            st.markdown(f"""
+                <div class="custom-card">
+                    <p style='color: gray; font-size: 13px; margin-bottom: 5px;'>GENERATED SIGNAL</p>
+                    <h4 style='color: #00efff; margin: 0;'>BUY LIMIT (ML Confirmed)</h4>
+                </div>
+            """, unsafe_allow_html=True)
 
 # ==========================================
 # TRADE HISTORY & LOGS TABLE
@@ -114,11 +133,11 @@ if os.path.exists(LOG_FILE):
             df_logs = pd.DataFrame(logs)
             st.dataframe(df_logs, use_container_width=True)
         else:
-            st.info("No trade signals recorded yet in `trade_history.json`.")
+            st.info("No trade logs recorded yet.")
     except Exception as e:
-        st.error(f"Error loading trade logs: {e}")
+        st.error(f"Error loading logs: {e}")
 else:
-    st.warning("Trade history log file not found. Logs will appear once signals are triggered.")
+    st.warning("Trade history log file not found.")
 
 # ==========================================
 # FOOTER
