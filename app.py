@@ -4,7 +4,6 @@ import json
 import os
 import datetime
 import time
-#import MetaTrader5 as mt5
 
 # ==========================================
 # PAGE CONFIGURATION
@@ -60,16 +59,24 @@ with col4:
 st.markdown("---")
 
 # ==========================================
-# MT5 DATA & MARKET ANALYSIS SECTION
+# MARKET ANALYSIS & SIGNALS SECTION
 # ==========================================
 st.subheader(f"📊 Market Analysis & Signals: {selected_symbol}")
 
-if st.button("🚀 Run Instant Market Scan & Fetch MT5 Data"):
-    with st.spinner(f"Connecting to MT5 and scanning {selected_symbol}..."):
+if st.button("🚀 Run Instant Market Scan & Fetch Data"):
+    with st.spinner(f"Scanning market and analyzing {selected_symbol}..."):
         time.sleep(1.0)
         
-        # এমটি৫ কানেকশন ও ডেটা চেক
-        if mt5.initialize():
+        # এমটি৫ কানেকশন ও ডেটা চেক (সেফ মোড - ক্লাউড ও লোকাল উভয়ের জন্য উপযোগী)
+        mt5_connected = False
+        try:
+            import MetaTrader5 as mt5
+            if mt5.initialize():
+                mt5_connected = True
+        except Exception:
+            mt5_connected = False
+
+        if mt5_connected:
             rates = mt5.copy_rates_from_pos(selected_symbol, mt5.TIMEFRAME_M30, 0, 10)
             mt5.shutdown()
             if rates is not None and len(rates) > 0:
@@ -81,12 +88,13 @@ if st.button("🚀 Run Instant Market Scan & Fetch MT5 Data"):
                 current_price = 2650.50 if selected_symbol == "XAUUSD" else 1.0850
                 trend = "🟢 BULLISH MARKET (Simulated Feed)"
         else:
+            # ক্লাউড সার্ভারের জন্য সিমুলেটেড ডেটা ফেড
             current_price = 2650.50 if selected_symbol == "XAUUSD" else 1.0850
-            trend = "🟢 BULLISH MARKET (Cloud Mode)"
+            trend = "🟢 BULLISH MARKET (Cloud Mode - MT5 Local Only)"
 
         st.success(f"Scan completed successfully for {selected_symbol}!")
         
-        # স্ক্রিনে লাইভ প্রাইস ও ট্রেন্ড প্রদর্শন
+        # স্ক্রিনে লাইভ প্রাইস, ট্রেন্ড ও জেনারেটেড সিগন্যাল প্রদর্শন
         res_col1, res_col2, res_col3 = st.columns(3)
         res_col1.metric(label="Current Live Price", value=f"${current_price}")
         res_col2.metric(label="Market Bias / Trend", value=trend)
